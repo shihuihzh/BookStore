@@ -6,6 +6,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,20 +33,23 @@ public class CommonDao<T> {
 			throw new NullPointerException("保存对象不能为空");
 		}
 		
+		PreparedStatement stat = null;
+		Connection conn = null;
+		
 		try {
 			
 			// 获得类对象
 			Class clazz = obj.getClass();
 			
 			// 打开连接
-			Connection conn = DbKit.me.getConnection();
+			conn = DbKit.me.getConnection();
 			
 			// 生成sql
 			String sql =  getPreInsertSql(clazz);
 			System.out.println("生成sql：" + sql);
 			
 			// 预备stat对象
-			PreparedStatement stat = conn.prepareStatement(sql);
+			 stat = conn.prepareStatement(sql);
 			
 			// 填充值
 			setPreInsertVal(stat, obj);
@@ -53,13 +57,16 @@ public class CommonDao<T> {
 			// 执行
 			stat.execute();
 			
-			// 关闭连接等，释放资源
-			DbKit.me.closeState(stat);
-			DbKit.me.closeConnection(conn);
+		
 			
 			
 		} catch (Exception e) {
 			throw new RuntimeException("保存失败",e);
+		} finally {
+			
+			// 关闭连接等，释放资源
+			DbKit.me.closeState(stat);
+			DbKit.me.closeConnection(conn);
 		}
 	}
 	
@@ -72,12 +79,16 @@ public class CommonDao<T> {
 	 * @return
 	 */
 	public <T> List<T> find(Class<T> entityClazz, String select, String where, Object... value) {
+		Connection conn = null;
+		PreparedStatement stat = null;
+		ResultSet query = null;
+		
 		try {
 			// 打开连接
-			Connection conn = DbKit.me.getConnection();
+			conn = DbKit.me.getConnection();
 			
 			// 预备stat对象
-			PreparedStatement stat = conn.prepareStatement(select + " " + (where != null?where:""));
+			stat = conn.prepareStatement(select + " " + (where != null?where:""));
 			
 			// 填充值
 			if(value != null) {
@@ -87,13 +98,19 @@ public class CommonDao<T> {
 			}
 			
 			// 执行查询
-			ResultSet query = stat.executeQuery();
+			query = stat.executeQuery();
 			
 			// 把查询结果封装成对象
 			return resultToObj(query, entityClazz);
 			
+			
+			
 		} catch (Exception e) {
 			throw new RuntimeException("查询失败！" , e);
+		} finally {
+			DbKit.me.closeQuery(query);
+			DbKit.me.closeState(stat);
+			DbKit.me.closeConnection(conn);
 		}
 		
 	}

@@ -3,6 +3,7 @@ package com.togogo.common;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
@@ -82,6 +83,7 @@ public class DbKit {
 	 * @param conn
 	 */
 	public void closeConnection(Connection conn) {
+		if(conn == null) return;
 		try {
 			conn.close();
 		} catch (SQLException e) {
@@ -95,8 +97,23 @@ public class DbKit {
 	 * @param stat
 	 */
 	public void closeState(Statement stat) {
+		if(stat == null) return;
 		try {
 			stat.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+	/**
+	 * 关闭 ResultSet
+	 * @param stat
+	 */
+	public void closeQuery(ResultSet set) {
+		if(set == null) return;
+		try {
+			set.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
