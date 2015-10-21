@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.togogo.common.BookStoreConstants;
+
 public class UserFilter implements Filter {
 
 	public UserFilter() {
@@ -28,14 +30,14 @@ public class UserFilter implements Filter {
 		HttpServletResponse res = (HttpServletResponse)response;
 		
 		
-		// 从session中获得username
+		// 从session中获得object
 		HttpSession session = req.getSession();
-		String username = (String) session.getAttribute("username");
+		Object user = session.getAttribute(BookStoreConstants.USER_SESSION_KEY);
 
-		if (username != null) {		// 存在 username 说明登陆过了
+		if (user != null) {		// 存在 user 说明登陆过了
 			chain.doFilter(request, response);
 		} else {
-			res.sendRedirect(req.getContextPath() + "/login2.html");
+			res.sendRedirect(req.getContextPath() + "/login.html");
 		}
 		
 	}

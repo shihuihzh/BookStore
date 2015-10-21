@@ -2,6 +2,7 @@ package com.togogo.common;
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -18,7 +19,7 @@ import java.util.Set;
  * @author Zhanhao Wong
  *
  */
-public class CommonDao {
+public class CommonDao<T> {
 	
 	private final static String INSERT_SQL =  "insert into %s (%s) values (%s)";
 	
@@ -26,7 +27,7 @@ public class CommonDao {
 	 * 通用保存方法
 	 * @param obj
 	 */
-	public void save(Object obj) {
+	public void save(T obj) {
 		if(obj == null) {
 			throw new NullPointerException("保存对象不能为空");
 		}
@@ -76,11 +77,13 @@ public class CommonDao {
 			Connection conn = DbKit.me.getConnection();
 			
 			// 预备stat对象
-			PreparedStatement stat = conn.prepareStatement(select + " " + where);
+			PreparedStatement stat = conn.prepareStatement(select + " " + (where != null?where:""));
 			
 			// 填充值
-			for(int i = 0; i < value.length; i++) {
-				stat.setObject(i+1, value[i]);
+			if(value != null) {
+				for(int i = 0; i < value.length; i++) {
+					stat.setObject(i+1, value[i]);
+				}
 			}
 			
 			// 执行查询
@@ -116,8 +119,22 @@ public class CommonDao {
 				for(String name : columnNames) {
 					String seMethodName = "set" +name;
 					for(Method m : methods) {
-						if(m.getName().equalsIgnoreCase(seMethodName)) {
-							m.invoke(obj, query.getObject(name));
+						if(m.getName().equalsIgnoreCase(seMethodName)) {	// 判断类型，暂时只判断简单类型
+							Class fieldType = m.getParameterTypes()[0];
+							if(fieldType == String.class) {
+								m.invoke(obj, query.getObject(name));
+							} else if(fieldType == int.class || fieldType == Integer.class) {
+								m.invoke(obj, ((Number)query.getObject(name)).intValue());
+							}  else if(fieldType == short.class || fieldType == Short.class) {
+								m.invoke(obj, ((Number)query.getObject(name)).shortValue());
+							}  else if(fieldType == long.class || fieldType == Long.class) {
+								m.invoke(obj, ((Number)query.getObject(name)).longValue());
+							}  else if(fieldType == double.class || fieldType == Double.class) {
+								m.invoke(obj, ((Number)query.getObject(name)).doubleValue());
+							} else if(fieldType == Date.class || fieldType == String.class) {
+								m.invoke(obj, query.getObject(name));
+							}
+							
 							break;
 						}
 					}

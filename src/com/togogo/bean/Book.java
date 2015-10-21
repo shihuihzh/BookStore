@@ -47,13 +47,16 @@ public class Book {
 	public void setPic(String pic) {
 		this.pic = pic;
 	}
-	public Book(String id, String name, double price) {
+	public Book(String id, String name, double price, String pic) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.price = price;
+		this.pic = pic;
 	}
 	
-	
+	public Book() {
+	}
+
 
 }
