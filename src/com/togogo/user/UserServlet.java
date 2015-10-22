@@ -95,17 +95,26 @@ public class UserServlet extends HttpServlet {
 
 		if (!password.equals(password2)) {
 			out.println("<h1>两次密码不一致</h1>");
+			return;
 		}
 
 		if (CommUtil.checkBlank(password)) {
 			out.println("<h1>密码不能为空</h1>");
+			return;
 		}
 
 		if (CommUtil.checkBlank(username)) {
 			out.println("<h1>用户名不能为空</h1>");
+			return;
+		}
+		
+		User user = userDao.findByUsername(username);
+		if(user != null) {
+			out.println("<h1>注册失败，该用户已存在!</h1> <a href=\"reg.html\">回到注册</a>");
+			return;
 		}
 
-		User user = new User();
+		user = new User();
 		user.setUsername(username);
 		user.setId(CommUtil.UUID());
 		user.setPassword(CommUtil.MD5(password));
@@ -130,10 +139,12 @@ public class UserServlet extends HttpServlet {
 
 		if (CommUtil.checkBlank(password)) {
 			out.println("<h1>密码不能为空</h1>");
+			return;
 		}
 
 		if (CommUtil.checkBlank(username)) {
 			out.println("<h1>用户名不能为空</h1>");
+			return;
 		}
 
 		User user = userDao.findByUsername(username);
