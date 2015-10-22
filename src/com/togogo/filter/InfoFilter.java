@@ -29,7 +29,7 @@ public class InfoFilter implements Filter {
 	 * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
 	 */
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-		PrintWriter out = response.getWriter();
+		
 		ServletContext ctx = request.getServletContext();
 		long oldTime = System.currentTimeMillis();
 		String author = ctx.getInitParameter("author");
@@ -41,6 +41,7 @@ public class InfoFilter implements Filter {
 		
 		try {
 			// 把信息打印
+			PrintWriter out = response.getWriter();
 			out.println(String.format("<p>Power by %s <br>网站在线人数：%d <br>网站总请求次数: %d <br>页面渲染时间：%d ms</p>", author, sessionList == null?0:sessionList.size(), rq==null?0:rq, System.currentTimeMillis()-oldTime));
 		} catch (Exception e) {
 		}
