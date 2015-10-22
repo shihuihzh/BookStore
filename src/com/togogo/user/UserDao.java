@@ -14,7 +14,7 @@ public class UserDao extends CommonDao<User> {
 	
 	
 	public User findByUsername(String username) {
-		List<User> user = find(User.class, "select * from user", "where username=?", username);
+		List<User> user = find(User.class, "select * from User", "where username=?", username);
 		return !user.isEmpty()?user.get(0):null;
 	}
 

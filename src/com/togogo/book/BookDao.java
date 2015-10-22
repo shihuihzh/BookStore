@@ -16,7 +16,7 @@ public class BookDao extends CommonDao<Book> {
 
 	
 	public List<Book> getAllBook() {
-		return find(Book.class, "select * from book", null, null);
+		return find(Book.class, "select * from Book", null, null);
 	}
 
 	public List<Book> findByIds(Set<String> keySet) {
@@ -25,7 +25,7 @@ public class BookDao extends CommonDao<Book> {
 	}
 
 	public Book findByIds(String id) {
-		List<Book> books = find(Book.class, "select * from book", "where id=?", id);
+		List<Book> books = find(Book.class, "select * from Book", "where id=?", id);
 		return books.isEmpty()?null:books.get(0);
 	}
 }
